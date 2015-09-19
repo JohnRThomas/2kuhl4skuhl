@@ -15,10 +15,20 @@
 #include <math.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
 #include <sys/types.h>
-#include <sys/time.h>
 #include <ctype.h> // isspace()
+
+#ifdef __APPLE__
+#include <unistd.h>
+#include <sys/time.h>
+#elif defined(_WIN32)
+#include<Time.h>
+struct timeval {
+	__int32 tv_sec;
+	__int32 tv_usec;
+};
+#endif
+
 
 #include "kuhl-nodep.h"
 
@@ -279,10 +289,10 @@ char* kuhl_trim_whitespace(char *str)
  * milliseconds */
 long kuhl_milliseconds()
 {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    long ms = (tv.tv_sec * 1000L) + tv.tv_usec / 1000L;
-    return ms;
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	long ms = (tv.tv_sec * 1000L) + tv.tv_usec / 1000L;
+	return ms;
 }
 
 /**

@@ -14,12 +14,15 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <math.h>
-#include <unistd.h>
 #include <iostream>
 #include <cstdlib>
 #include <string>
 #include <cerrno>
 #include <time.h>
+
+#ifdef __APPLE__
+#include <unistd.h>
+#endif
 
 #include "vrpn_Text.h"
 #include "vrpn_Tracker.h"
@@ -27,6 +30,10 @@
 #include "vrpn_Button.h"
 #include "vrpn_Connection.h"
 #include "vecmat.h"
+
+#if defined(_WIN32)
+#define usleep Sleep
+#endif
 
 using namespace std;
 
@@ -41,15 +48,15 @@ class myTracker : public vrpn_Tracker
 	struct timeval _timestamp;
 	
   private:
-  	bool verbose;
-  	bool quiet;
-  	bool noise;
-  	bool type;
-  	char* trackerName;
-  	int fd;
-  	int modifier;
-  	long lastrecord;
-    double angle;
+	bool verbose;
+	bool quiet;
+	bool noise;
+	bool type;
+	char* trackerName;
+	int fd;
+	int modifier;
+	long lastrecord;
+	double angle;
 };
 
 myTracker::myTracker( const char* name, bool* flags, vrpn_Connection *c, int fd ) :
@@ -63,7 +70,7 @@ myTracker::myTracker( const char* name, bool* flags, vrpn_Connection *c, int fd 
 	this->type = flags[3];
 	this->fd = fd;
 	this->modifier = ((double) rand() / (RAND_MAX)) * (360);
-    this->angle = 0;
+	this->angle = 0;
 }
 
 void myTracker::mainloop()
@@ -119,7 +126,7 @@ void myTracker::mainloop()
 	int len = vrpn_Tracker::encode_to(msgbuf);
 	
 	if (d_connection->pack_message(len, _timestamp, position_m_id, d_sender_id, msgbuf,
-	                               vrpn_CONNECTION_LOW_LATENCY))
+								   vrpn_CONNECTION_LOW_LATENCY))
 	{
 		fprintf(stderr,"can't write message: tossing\n");
 	}
@@ -153,22 +160,23 @@ int main(int argc, char* argv[])
 	//See Linux man(3) getopt for more info
 	int option = 0;
 	const char* options = "f:hnqt:v";
+#ifdef __APPLE__
 	while((option = getopt(argc, argv, options)) != -1){
 
-    	switch(option)
+		switch(option)
 		{
-        	case 'f':
+			case 'f':
 				//decriment the option index since it get's auto-incremented twice by getopt to
 				//pass over the expected single parameter. We need to support multiple params.
-       			for(optind--; optind < argc && argv[optind][0] != '-' && strlen(argv[optind]); optind++)
+				for(optind--; optind < argc && argv[optind][0] != '-' && strlen(argv[optind]); optind++)
 				{
 					//Read all of the file names
 					filesc++;
 					filesv = (char**)realloc(filesv, filesc * sizeof(char**));
 					filesv[filesc-1] = argv[optind];
-        		}
-        		break;
-        	case 'h':
+				}
+				break;
+			case 'h':
 				//free up file names incase the user specified them.
 				if(filesv != NULL)free(filesv);
 				if(objNamesv != NULL)free(objNamesv);
@@ -183,29 +191,29 @@ int main(int argc, char* argv[])
 				printf("\t-t [NAME]...\tTracker: use the specified names for tracked objects.\n\t\t\t\t NOTE: does nothing if any files are specified.\n");
 				printf("\t-v\t\tVerbose: turn on extra debugging.\n");
 				exit(0);
-        		break;
-        	case 'n':
+				break;
+			case 'n':
 				noise = true;
-        		break;
-        	case 'q':
+				break;
+			case 'q':
 				quiet = true;
 				verbose = false;
-        		break;
-        	case 't':
-        		//decriment the option index since it get's auto-incremented twice by getopt to
+				break;
+			case 't':
+				//decriment the option index since it get's auto-incremented twice by getopt to
 				//pass over the expected single parameter. We need to support multiple params.
-       			for(optind--; optind < argc && argv[optind][0] != '-' && strlen(argv[optind]); optind++)
+				for(optind--; optind < argc && argv[optind][0] != '-' && strlen(argv[optind]); optind++)
 				{
 					//Read all of the file names
 					objNamesc++;
 					objNamesv = (char**)realloc(objNamesv, objNamesc * sizeof(char**));
 					objNamesv[objNamesc-1] = argv[optind];
-        		}
-        		break;
-        	case 'v':
+				}
+				break;
+			case 'v':
 				verbose = true;
 				quiet = false;
-        		break;
+				break;
 			default:
 				//This is an urecognized option
 				if(optind < argc)
@@ -217,7 +225,7 @@ int main(int argc, char* argv[])
 				if(objNamesv != NULL)free(objNamesv);
 				exit(1);
 				break;
-    	}
+		}
 	}
 	
 	//if the user didn't specify a tracker or a file, use the default traker name.
@@ -248,18 +256,31 @@ int main(int argc, char* argv[])
 		}
 		printf("-------------------\n");
 	}
-	
+
+	//Set the tracker type to file if files were specified, otherwise set it to data type.
+	bool trackerst = filesc > 0 ? FILE_TRACKER : DATA_TRACKER;
+
+	//Set the tracker count to the number of either files or data trackers depending on the type.
+	int trackersc = trackerst ? filesc : objNamesc;
+
+	//Make an array of tracker objects that is the size of the number of trackers we need.
+	myTracker* trackersv[trackersc];
+
+#elif defined(_WIN32)
+	//Set the tracker type to file if files were specified, otherwise set it to data type.
+	bool trackerst = DATA_TRACKER;
+
+	//Set the tracker count to the number of either files or data trackers depending on the type.
+	int trackersc = 1;
+
+	//Make an array of tracker objects that is the size of the number of trackers we need.
+	myTracker* trackersv[1];
+#endif
+
 	if(verbose)printf("Opening VRPN connection\n");
 	vrpn_Connection_IP* m_Connection = new vrpn_Connection_IP();
 	
-	//Set the tracker type to file if files were specified, otherwise set it to data type.
-	bool trackerst = filesc > 0 ? FILE_TRACKER : DATA_TRACKER;
 	
-	//Set the tracker count to the number of either files or data trackers depending on the type.
-	int trackersc = trackerst ? filesc : objNamesc;
-	
-	//Make an array of tracker objects that is the size of the number of trackers we need.
-	myTracker* trackersv[trackersc];
 	
 	bool flags[4] = {verbose, quiet, noise, trackerst};
 	for(int i = 0; i < trackersc; i++)
@@ -271,16 +292,16 @@ int main(int argc, char* argv[])
 		else
 		{
 			fprintf(stderr, "Sorry, files aren't implemented yet.\n");
-    		exit(1);
+			exit(1);
 			/*
 			int fd = open(filesv[i], O_RDONLY);
 			if(fd == -1)
 			{
 				fprintf(stderr, "Failed to open file \"%s\": %s\n", filesv[i], strerror(errno));
-    			exit(1);
-    		}
-    		
-    		char* name;
+				exit(1);
+			}
+			
+			char* name;
 			tdl_prepare(fd, &name);
 			if(verbose)printf("Creating tracker for %s from file %s\n", name, filesv[i]);
 			trackersv[i] = new myTracker(name, flags, m_Connection, fd);
@@ -299,8 +320,8 @@ int main(int argc, char* argv[])
 
 		//serverTracker->mainloop();
 		m_Connection->mainloop();
-        usleep(100000);
-    }
+		usleep(100000);
+	}
 	if(filesv != NULL)free(filesv);
 	if(objNamesv != NULL)free(objNamesv);
 }
