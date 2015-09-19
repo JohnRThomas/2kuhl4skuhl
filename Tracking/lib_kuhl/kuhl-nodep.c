@@ -15,18 +15,10 @@
 #include <math.h>
 #include <string.h>
 #include <time.h>
-#include <sys/types.h>
-#include <ctype.h> // isspace()
-
-#ifdef __APPLE__
 #include <unistd.h>
+#include <sys/types.h>
 #include <sys/time.h>
-#endif
-
-#ifdef _WIN32
-#include<Time.h>
-#endif
-
+#include <ctype.h> // isspace()
 
 #include "kuhl-nodep.h"
 
@@ -281,6 +273,16 @@ char* kuhl_trim_whitespace(char *str)
 	// of the characters plus the null terminator. */
 	memmove(str, firstNonSpace, lastNonSpace-firstNonSpace+2);
 	return str;
+}
+
+/** Returns the current time in milliseconds. 1 second = 1000
+ * milliseconds */
+long kuhl_milliseconds()
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    long ms = (tv.tv_sec * 1000L) + tv.tv_usec / 1000L;
+    return ms;
 }
 
 /**

@@ -33,14 +33,14 @@ int main(int argc, char* argv[]){
 	//Buffers for the data.
 	float pos[3];
 	float rotMat[9];
-	char* trackerName = argv[1];
-	
+    char* trackerName = argv[1];
+    
 	//Loop until Ctrl+C.
 	while(1){
 	
 		//Get the next vrpn entry
 		if(vrpn_get(trackerName, NULL, pos, rotMat)){
-			printf("x: %.3f y: %.3f z: %.3f\n", pos[0], pos[1], pos[2]);
+   	    	printf("x: %.3f y: %.3f z: %.3f\n", pos[0], pos[1], pos[2]);
 			usleep(100000);
 		}
 	}
