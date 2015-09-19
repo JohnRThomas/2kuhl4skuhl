@@ -15,7 +15,9 @@
 #include <math.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #include <ctype.h> // isspace()
 
 #include "kuhl-nodep.h"
@@ -169,7 +171,7 @@ static char* kuhl_path_concat_read(const char* a, const char* b)
 		return NULL;
 
 	int combinedLen = strlen(a)+strlen(b)+32; // ensure plenty of space
-	char *combined = kuhl_malloc(sizeof(char)*combinedLen);
+	char *combined = (char*)kuhl_malloc(sizeof(char)*combinedLen);
 	int ret = snprintf(combined, combinedLen, "%s/%s", a, b);
 	if(ret < 0 || ret >= combinedLen)
 	{
@@ -185,141 +187,6 @@ static char* kuhl_path_concat_read(const char* a, const char* b)
 		return NULL;
 	}
 }
-
-/* Given a filename, tries to find that file by:
-   1) Looking for the file using the given path.
-
-   2) Change '\' characters to '/' in case the provided path uses
-   Windows-style path separators.
-
-   3) Search for file relative to directory of executable (on Linux)
-   (also, try changing the path separators.)
-
-   4) Search for file using a list of hard-coded directories (also,
-   try changing the path separators).
-
-   @param filename The name of the file the caller wants to open.
-   @return A path to the file that may be different than the path
-   provided in the filename parameter. The returned string should be
-   free()'d. If the file was not found, a copy of the original
-   filename is returned.
-*/
-char* kuhl_find_file(const char *filename)
-{
-	if(kuhl_can_read_file(filename))
-		return strdup(filename);
-
-	char *pathSepChange = kuhl_fix_path(filename);
-	if(kuhl_can_read_file(pathSepChange))
-		return pathSepChange;
-
-	char *newPath = NULL; // needs to be declared for all OSs
-#ifdef __linux__
-	/* If we can't open the filename directly, then try opening it
-	   with the full path based on the path to the
-	   executable. This allows us to more easily run programs from
-	   outside of the same directory that the executable that the
-	   executable resides without having to specify an absolute
-	   path to our shader programs. */
-	char exe[1024];
-	ssize_t len = readlink("/proc/self/exe", exe, 1023);
-	exe[len]='\0';
-	char *dir = dirname(exe);
-	newPath = kuhl_path_concat_read(dir, filename);
-	if(newPath)
-	{
-		free(pathSepChange);
-		return newPath;
-	}
-	/* Try using executable directory along with the path that has
-	 * corrected file path separators */
-	newPath = kuhl_path_concat_read(dir, pathSepChange);
-	if(newPath)
-	{
-		free(pathSepChange);
-		return newPath;
-	}
-#endif
-
-	/* Search for file in common paths. */
-	char *commonDirs[] = { "/home/kuhl/public-ogl/data",  // CCSR
-						   "/home/campus11/kuhl/public-ogl/data", // Rekhi
-						   "/research/kuhl/public-ogl/data" }; // IVS
-	for(int i=0; i<3; i++)
-	{
-		newPath = kuhl_path_concat_read(commonDirs[i], filename);
-		if(newPath)
-		{
-			free(pathSepChange);
-			return newPath;
-		}
-		/* Try converting path separators too */
-		newPath = kuhl_path_concat_read(commonDirs[i], pathSepChange);
-		if(newPath)
-		{
-			free(pathSepChange);
-			return newPath;
-		}
-	}
-	
-	free(pathSepChange);
-	return strdup(filename);
-}
-
-
-
-/** Reads a text file.
- *
- * @param filename The file that we want to read in.
- *
- * @return An array of characters for the file. This array should be
- * free()'d when the caller is finished with it. Exits if an error
- * occurs.
- */
-char* kuhl_text_read(const char *filename)
-{
-	int chunkSize    = 1024;        /* read in chunkSize bytes at a time */
-	int contentSpace = chunkSize;   /* space in 'content' array */
-
-	/* We add one more character to create room to store a '\0' at the
-	 * end. */
-	char *content = (char*) kuhl_malloc(sizeof(char)*(contentSpace+1));
-
-	/* Pointer to where next chunk should be stored */
-	char *contentLoc = content;
-
-	char *newFilename = kuhl_find_file(filename);
-	FILE *fp = fopen(newFilename,"rt");
-	free(newFilename);
-	int readChars;
-
-	if(fp == NULL)
-	{
-		fprintf(stderr, "ERROR: Can't open %s.\n", filename);
-		exit(EXIT_FAILURE);
-	}
-
-	do
-	{
-		readChars = fread(contentLoc, sizeof(char), chunkSize, fp);
-		contentLoc[readChars] = '\0';
-		contentSpace += chunkSize;
-		content = (char*) realloc(content, sizeof(char)*(contentSpace+1));
-		contentLoc = content + contentSpace - chunkSize;
-
-	} while( readChars == chunkSize );
-
-	/* We should now be at end of file. If not, there was an error. */
-	if(feof(fp) == 0)
-	{
-		fprintf(stderr, "ERROR: Can't read %s\n", filename);
-		exit(EXIT_FAILURE);
-	}
-
-	fclose(fp);
-	return content;
-}
-
 
 static int kuhl_random_init_done = 0; /*< Have we called srand48() yet? */
 /** Generates a random integer between min and max inclusive. This
@@ -359,7 +226,7 @@ int kuhl_randomInt(int min, int max)
 void kuhl_shuffle(void *array, int n, int size)
 {
 	char *arr = (char*) array; // Use a char array which we know uses 1 byte pointer arithmetic
-	char *tmp = kuhl_malloc(size); // avoid use of VLA
+	char *tmp = (char*)kuhl_malloc(size); // avoid use of VLA
 
 	// https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 	for(int i=n-1; i>=1; i--)
@@ -408,6 +275,15 @@ char* kuhl_trim_whitespace(char *str)
 	return str;
 }
 
+/** Returns the current time in milliseconds. 1 second = 1000
+ * milliseconds */
+long kuhl_milliseconds()
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    long ms = (tv.tv_sec * 1000L) + tv.tv_usec / 1000L;
+    return ms;
+}
 
 /**
    Generate random numbers following Gaussian distribution. The

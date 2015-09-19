@@ -43,13 +43,12 @@ typedef struct
 
 
 int kuhl_can_read_file(const char *filename);
-char* kuhl_find_file(const char *filename);
-char* kuhl_text_read(const char *filename);
 
 int kuhl_randomInt(int min, int max);
 void kuhl_shuffle(void *array, int n, int size);
 char* kuhl_trim_whitespace(char *str);
 double kuhl_gauss();
+long kuhl_milliseconds();
 
 
 #ifdef __cplusplus

@@ -23,6 +23,10 @@
 #include "kuhl-nodep.h"
 #include "kalman.h"
 
+#if defined(__APPLE__) || defined(__linux)
+#include <unistd.h>
+#endif
+
 #if defined(_WIN32)
 #define snprintf sprintf_s
 #define usleep Sleep
