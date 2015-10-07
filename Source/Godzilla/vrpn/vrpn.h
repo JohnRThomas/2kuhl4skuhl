@@ -14,14 +14,15 @@
 /**
  * 
  */
-class GODZILLA_API vrpn
+class GODZILLA_API VRPN
 {
 public:
-	vrpn(std::string object);
-	~vrpn();
+	VRPN(std::string object);
+	~VRPN();
 	int get(double pos[3], double orient[16]);
 	Kalman *kalman;
 	vrpn_TRACKERCB lastData;
+	static void VRPN_CALLBACK handle_tracker(void *data, vrpn_TRACKERCB t);
 
 private:
 	vrpn_Tracker_Remote *tracker;
