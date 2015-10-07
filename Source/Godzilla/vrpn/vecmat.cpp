@@ -2,7 +2,12 @@
 
 #include "Godzilla.h"
 #include "vecmat.h"
+#include "math.h"
 
+
+double Vector::norm(double v[3], int n){
+	return sqrt(Vector::dot(v, v, n));
+}
 
 void Vector::set(double v[3], double a, double b, double c)
 {

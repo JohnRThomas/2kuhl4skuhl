@@ -9,6 +9,7 @@ class GODZILLA_API Vector
 {
 public:
 	static void set(double v[3], double a, double b, double c);
+	static double norm(double v[], int n);
 	static void copy(double result[], const double a[], const int n);
 	static void mult_vecNd(double m[], const double A[], const double B[], const int n);
 	static void scalarMult_new(double result[], const double v[], const double scalar, const int n);

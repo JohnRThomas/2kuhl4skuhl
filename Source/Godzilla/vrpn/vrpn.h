@@ -7,6 +7,7 @@
 #include <vrpn_Tracker.h>
 #include "HideWindowsPlatformTypes.h"
 #include <vrpn_quat.h>
+#include <string>
 
 #include "kalman.h"
 
@@ -16,13 +17,15 @@
 class GODZILLA_API vrpn
 {
 public:
-	vrpn();
+	vrpn(std::string object);
 	~vrpn();
-	int get(const char *object, const char *hostname, float pos[3], float orient[16]);
+	int get(double pos[3], double orient[16]);
+	Kalman *kalman;
+	vrpn_TRACKERCB lastData;
 
 private:
-	Kalman *kalman;
-
-	char* default_host();
-	char* trim_whitespace(char *str);
+	vrpn_Tracker_Remote *tracker;
+	std::string hostname;
+	std::string default_host();
+	std::string trim_whitespace(std::string str);
 };
