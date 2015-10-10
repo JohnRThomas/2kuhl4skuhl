@@ -17,10 +17,11 @@
 class GODZILLA_API VRPN
 {
 public:
-	VRPN(std::string object);
+	VRPN(std::string object, std::string host);
 	~VRPN();
 	int get(double pos[3], double orient[16]);
-	Kalman *kalman;
+	Kalman *kalmanX, *kalmanY, *kalmanZ;
+	Kalman *kalmanPitch, *kalmanYaw, *kalmanRoll;
 	vrpn_TRACKERCB lastData;
 	static void VRPN_CALLBACK handle_tracker(void *data, vrpn_TRACKERCB t);
 

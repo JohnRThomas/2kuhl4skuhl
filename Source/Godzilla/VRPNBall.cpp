@@ -17,7 +17,7 @@ AVRPNBall::AVRPNBall()
 void AVRPNBall::BeginPlay()
 {
 	Super::BeginPlay();
-	vrpn = new VRPN("test");
+	vrpn = new VRPN("test", "localhost");
 }
 
 // Called every frame
@@ -25,18 +25,26 @@ void AVRPNBall::Tick( float DeltaTime )
 {
 	Super::Tick(DeltaTime);
 	vrpn->get(pos, orient);
-	double x = 10.0 * pos[0];
-	double y = 10.0 * pos[2];
-	double z = 100.0 * pos[1];
-	UE_LOG(LogTemp, Warning, TEXT("(%.2f, %.2f, %.2f)"), x, y, z);
+	double x = 100.0 * pos[0];
+	double y = 100.0 * pos[1];
+	double z = 100.0 * pos[2];
+	double pitch = orient[0];
+	double yaw = orient[1];
+	double roll = orient[2];
+	UE_LOG(LogTemp, Warning, TEXT("Location(%.2f, %.2f, %.2f)"), x, y, z);
+	UE_LOG(LogTemp, Warning, TEXT("Angle(%.2f, %.2f, %.2f)"), pitch, yaw, roll);
 	FVector NewLocation = GetActorLocation();
+	FRotator NewRotation = GetActorRotation();
 	float DeltaHeight = (FMath::Sin(runTime + DeltaTime) - FMath::Sin(runTime));
 	NewLocation.X = x;
 	NewLocation.Y = y;
 	NewLocation.Z = 200.0 + z + DeltaHeight * 20.0f;
+	NewRotation.Pitch = pitch;
+	NewRotation.Yaw = yaw;
+	NewRotation.Roll = roll;
 	runTime += DeltaTime;
 	if (x > -300 && x < 300 && y > -300 && y < 300 && z > -300 && z < 300){
-		SetActorLocation(NewLocation);
+		SetActorLocationAndRotation(NewLocation, NewRotation);
 	}
 }
 
