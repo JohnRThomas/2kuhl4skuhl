@@ -69,9 +69,6 @@
     <ClInclude Include="..\..\Source\Godzilla\vrpn\vecmat.h">
       <Filter>Source\Godzilla\vrpn</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Godzilla\VRPNBall.h">
-      <Filter>Source\Godzilla</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\Godzilla\vrpn\vrpn.cpp">
@@ -82,9 +79,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\Godzilla\vrpn\vecmat.cpp">
       <Filter>Source\Godzilla\vrpn</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Godzilla\VRPNBall.cpp">
-      <Filter>Source\Godzilla</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

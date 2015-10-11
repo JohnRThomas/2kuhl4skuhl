@@ -1,29 +1,30 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Godzilla.h"
-#include "VRPNBall.h"
+#include "VRPNActor.h"
 #include "vrpn/vrpn.h"
 #include <string>
 
 // Sets default values
-AVRPNBall::AVRPNBall()
+AVRPNActor::AVRPNActor()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
 
 // Called when the game starts or when spawned
-void AVRPNBall::BeginPlay()
+void AVRPNActor::BeginPlay()
 {
 	Super::BeginPlay();
 	vrpn = new VRPN("test", "localhost");
+
 }
 
 // Called every frame
-void AVRPNBall::Tick( float DeltaTime )
+void AVRPNActor::Tick( float DeltaTime )
 {
-	Super::Tick(DeltaTime);
+	Super::Tick( DeltaTime );
 	vrpn->get(pos, orient);
 	double x = 100.0 * pos[0];
 	double y = 100.0 * pos[1];
@@ -46,5 +47,6 @@ void AVRPNBall::Tick( float DeltaTime )
 	if (x > -300 && x < 300 && y > -300 && y < 300 && z > -300 && z < 300){
 		SetActorLocationAndRotation(NewLocation, NewRotation);
 	}
+
 }
 

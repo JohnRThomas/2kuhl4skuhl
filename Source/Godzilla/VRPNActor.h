@@ -4,26 +4,28 @@
 
 #include "vrpn/vrpn.h"
 #include "GameFramework/Actor.h"
-#include "VRPNBall.generated.h"
+#include "VRPNActor.generated.h"
 
 UCLASS()
-class GODZILLA_API AVRPNBall : public AActor
+class GODZILLA_API AVRPNActor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AVRPNBall();
+	AVRPNActor();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
-
 	float runTime;
+
 private:
 	VRPN* vrpn;
 	double pos[3];
 	double orient[16];
+
+	
 };

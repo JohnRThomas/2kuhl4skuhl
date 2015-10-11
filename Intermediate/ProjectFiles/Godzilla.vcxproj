@@ -252,11 +252,9 @@
     <NMakeOutput>..\..\Binaries\Win64\Godzilla-Win64-Shipping.exe</NMakeOutput>
   </PropertyGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\Godzilla\VRPNBall.cpp" />
     <ClCompile Include="..\..\Source\Godzilla\vrpn\kalman.cpp" />
     <ClCompile Include="..\..\Source\Godzilla\vrpn\vecmat.cpp" />
     <ClCompile Include="..\..\Source\Godzilla\vrpn\vrpn.cpp" />
-    <ClInclude Include="..\..\Source\Godzilla\VRPNBall.h" />
     <ClInclude Include="..\..\Source\Godzilla\vrpn\kalman.h" />
     <ClInclude Include="..\..\Source\Godzilla\vrpn\vecmat.h" />
     <ClInclude Include="..\..\Source\Godzilla\vrpn\vrpn.h" />
