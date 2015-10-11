@@ -10,15 +10,16 @@ AVRPNActor::AVRPNActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	Hostname = FString(TEXT("localhost"));
+	TrackerName = FString(TEXT("test"));
 }
 
 // Called when the game starts or when spawned
 void AVRPNActor::BeginPlay()
 {
 	Super::BeginPlay();
-	vrpn = new VRPN("test", "localhost");
-
+	
+	vrpn = new VRPN(TrackerName, Hostname);
 }
 
 // Called every frame
@@ -32,8 +33,8 @@ void AVRPNActor::Tick( float DeltaTime )
 	double pitch = orient[0];
 	double yaw = orient[1];
 	double roll = orient[2];
-	UE_LOG(LogTemp, Warning, TEXT("Location(%.2f, %.2f, %.2f)"), x, y, z);
-	UE_LOG(LogTemp, Warning, TEXT("Angle(%.2f, %.2f, %.2f)"), pitch, yaw, roll);
+	//UE_LOG(LogTemp, Warning, TEXT("Location(%.2f, %.2f, %.2f)"), x, y, z);
+	//UE_LOG(LogTemp, Warning, TEXT("Angle(%.2f, %.2f, %.2f)"), pitch, yaw, roll);
 	FVector NewLocation = GetActorLocation();
 	FRotator NewRotation = GetActorRotation();
 	float DeltaHeight = (FMath::Sin(runTime + DeltaTime) - FMath::Sin(runTime));

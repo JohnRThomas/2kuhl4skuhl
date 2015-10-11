@@ -17,11 +17,12 @@ void VRPN_CALLBACK VRPN::handle_tracker(void *data, vrpn_TRACKERCB t){
 	((VRPN*)data)->lastData = t;
 }
 
-VRPN::VRPN(std::string object, std::string host){
-	hostname = host;
+VRPN::VRPN(FString object, FString host){
+	std::string name(TCHAR_TO_UTF8(*host));
+	std::string ob(TCHAR_TO_UTF8(*object));
+	UE_LOG(LogTemp, Warning, TEXT("Connecting to VRPN server: %s"), *host);
+	hostname = name;
 
-	/* If this is our first time, create a tracker for the object@hostname string, register the callback handler. */
-	printf("Connecting to VRPN server: %s\n", hostname);
 	// If we are making a TCP connection and the server isn't up, the following function call may hang for a long time
 	vrpn_Connection *connection = vrpn_get_connection_by_name(hostname.c_str());
 
@@ -35,12 +36,12 @@ VRPN::VRPN(std::string object, std::string host){
 	if (!connection->connected())
 	{
 		delete connection;
-		printf(("Failed to connect to tracker: " + hostname + "\n").c_str());
+		UE_LOG(LogTemp, Warning, TEXT("Failed to connect to tracker: %s"), *host);
 		tracker = NULL;
 	}
 	else{
 		connection->mainloop();
-		std::string fullname = object + "@" + hostname;
+		std::string fullname = ob + "@" + hostname;
 
 		tracker = new vrpn_Tracker_Remote(fullname.c_str(), connection);
 

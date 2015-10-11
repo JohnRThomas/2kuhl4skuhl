@@ -22,7 +22,13 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 	float runTime;
 
-private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VRPN Variables")
+	FString Hostname;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VRPN Variables")
+	FString TrackerName;
+
+	private:
 	VRPN* vrpn;
 	double pos[3];
 	double orient[16];

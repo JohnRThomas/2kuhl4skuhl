@@ -17,7 +17,7 @@
 class GODZILLA_API VRPN
 {
 public:
-	VRPN(std::string object, std::string host);
+	VRPN(FString object, FString host);
 	~VRPN();
 	int get(double pos[3], double orient[16]);
 	Kalman *kalmanX, *kalmanY, *kalmanZ;
