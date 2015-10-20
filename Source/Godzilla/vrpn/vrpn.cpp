@@ -65,20 +65,19 @@ int VRPN::get(double pos[3], double orient[3]){
 		tracker->mainloop();
 		vrpn_TRACKERCB t = lastData;
 
-
-		//Swap the y and z axis for vrpn->UE4
-		pos[0] = t.pos[0];//kalmanX->estimate(t.pos[0]);
-		pos[1] = t.pos[2];//kalmanY->estimate(t.pos[2]);
-		pos[2] = t.pos[1];//kalmanZ->estimate(t.pos[1]);
+		//Swap the x and y axis for vrpn->UE4
+		pos[0] = t.pos[1];//kalmanX->estimate(t.pos[0]);
+		pos[1] = t.pos[0];//kalmanY->estimate(t.pos[2]);
+		pos[2] = t.pos[2];//kalmanZ->estimate(t.pos[1]);
 
 		q_vec_type orientd;
 		// Convert quaternion into orientation matrix.
 		q_to_euler(orientd, t.quat);
 
-		//Swap the yaw and roll for vrpn->UE4
-		orient[0] = 57.295779513*orientd[0];// kalmanPitch->estimate(orientd[0]);
-		orient[1] = 57.295779513*orientd[1];// kalmanRoll->estimate(orientd[2]);
-		orient[2] = 57.295779513*orientd[2];// kalmanYaw->estimate(orientd[1]);
+		//Swap the pitch and yaw for vrpn->UE4
+		orient[0] = 57.295779513*orientd[2];// kalmanYaw->estimate(orientd[1]);
+		orient[1] = -57.295779513*orientd[0];// kalmanRoll->estimate(orientd[2]);
+		orient[2] = 57.295779513*orientd[1];// kalmanPitch->estimate(orientd[0]);
 		return 1;
 	}
 	return 0;

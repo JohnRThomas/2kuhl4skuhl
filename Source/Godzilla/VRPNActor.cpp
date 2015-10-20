@@ -48,6 +48,5 @@ void AVRPNActor::Tick( float DeltaTime )
 	if (x > -300 && x < 300 && y > -300 && y < 300 && z > -300 && z < 300){
 		SetActorLocationAndRotation(NewLocation, NewRotation);
 	}
-
 }
 

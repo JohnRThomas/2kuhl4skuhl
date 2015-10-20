@@ -31,7 +31,5 @@ public:
 	private:
 	VRPN* vrpn;
 	double pos[3];
-	double orient[16];
-
-	
+	double orient[16];	
 };
