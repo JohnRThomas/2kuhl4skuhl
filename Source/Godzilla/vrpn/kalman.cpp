@@ -58,7 +58,7 @@ Kalman::Kalman(float sigma_meas, float qScale){
 	velocity is changing due to acceleration, and acceleration is fixed,
 	errors in acceleration will occur.
 	*/
-	qScale = qScale;
+	Kalman::qScale = qScale;
 
 	// Variance of our measurements.  A small number indicates that our
 	// measurements are noise-free.

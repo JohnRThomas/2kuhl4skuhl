@@ -9,28 +9,20 @@ void VRPN_CALLBACK VRPN::handle_tracker(void *data, vrpn_TRACKERCB t){
 	/* Some tracking systems return large values when a point gets
 	* lost. If the tracked point seems to be lost, ignore this
 	* update. */
-	double pos[3];
-	Vector::set(pos, t.pos[0], t.pos[1], t.pos[2]);
 
-	if (Vector::norm(pos, 3) > 100)
+	if (Vector::norm(t.pos, 3) > 100)
 		return;
 
 	// Store the data in our map so that someone can use it later.
-	VRPN* tracker = (VRPN*)data;
-	//t.pos[0] = tracker->kalman->estimate(t.pos[0]);
-	double x = t.pos[0];
-	double y = t.pos[1];
-	double z = t.pos[2];
-
-	//UE_LOG(LogTemp, Warning, TEXT("(%.2f, %.2f, %.2f)"), x, y, z);
-	tracker->lastData = t;
+	((VRPN*)data)->lastData = t;
 }
 
-VRPN::VRPN(std::string object){
-	hostname = "localhost";
+VRPN::VRPN(FString object, FString host){
+	std::string name(TCHAR_TO_UTF8(*host));
+	std::string ob(TCHAR_TO_UTF8(*object));
+	UE_LOG(LogTemp, Warning, TEXT("Connecting to VRPN server: %s"), *host);
+	hostname = name;
 
-	/* If this is our first time, create a tracker for the object@hostname string, register the callback handler. */
-	printf("Connecting to VRPN server: %s\n", hostname);
 	// If we are making a TCP connection and the server isn't up, the following function call may hang for a long time
 	vrpn_Connection *connection = vrpn_get_connection_by_name(hostname.c_str());
 
@@ -44,79 +36,49 @@ VRPN::VRPN(std::string object){
 	if (!connection->connected())
 	{
 		delete connection;
-		printf(("Failed to connect to tracker: " + hostname + "\n").c_str());
+		UE_LOG(LogTemp, Warning, TEXT("Failed to connect to tracker: %s"), *host);
 		tracker = NULL;
 	}
 	else{
 		connection->mainloop();
-		std::string fullname = object + "@" + hostname;
+		std::string fullname = ob + "@" + hostname;
 
 		tracker = new vrpn_Tracker_Remote(fullname.c_str(), connection);
 
 		tracker->register_change_handler((void*)this, handle_tracker);
 
-		kalman = new Kalman(0.1, 0.1);
+		kalmanX = new Kalman(0.1, 0.1);
+		kalmanY = new Kalman(0.1, 0.1);
+		kalmanZ = new Kalman(0.1, 0.1);
+		kalmanPitch = new Kalman(0.1, 0.1);
+		kalmanYaw = new Kalman(0.1, 0.1);
+		kalmanRoll = new Kalman(0.1, 0.1);
 	}
 }
 
-int VRPN::get(double pos[3], double orient[16]){
+int VRPN::get(double pos[3], double orient[3]){
 	/* Set to default values */
 	Vector::set(pos, 10000, 10000, 10000);
-	Matrix::identity(orient, 4);
+	Vector::set(orient, 0, 0, 0);
+
 	if (tracker != NULL){
 		tracker->mainloop();
 		vrpn_TRACKERCB t = lastData;
-		double pos4[4];
-		for (int i = 0; i < 3; i++)
-			pos4[i] = t.pos[i];
-		pos4[3] = 1;
 
-		double orientd[16];
+		//Swap the x and y axis for vrpn->UE4
+		pos[0] = t.pos[1];//kalmanX->estimate(t.pos[0]);
+		pos[1] = t.pos[0];//kalmanY->estimate(t.pos[2]);
+		pos[2] = t.pos[2];//kalmanZ->estimate(t.pos[1]);
+
+		q_vec_type orientd;
 		// Convert quaternion into orientation matrix.
-		q_to_ogl_matrix(orientd, t.quat);
-		for (int i = 0; i < 16; i++)
-			orient[i] = (float)orientd[i];
+		q_to_euler(orientd, t.quat);
 
-		/* VICON in the MTU IVS lab is typically calibrated so that:
-		* X = points to the right (while facing screen)
-		* Y = points into the screen
-		* Z = up
-		* (left-handed coordinate system)
-		*
-		* PPT is typically calibrated so that:
-		* X = the points to the wall that has two closets at both corners
-		* Y = up
-		* Z = points to the door
-		* (right-handed coordinate system)
-		*
-		* By default, OpenGL assumes that:
-		* X = points to the right (while facing screen in the IVS lab)
-		* Y = up
-		* Z = points OUT of the screen (i.e., -Z points into the screen in te IVS lab)
-		* (right-handed coordinate system)
-		*
-		* Below, we convert the position and orientation
-		* information into the OpenGL convention.
-		*/
-		if (hostname.length() > 14 && hostname.compare("tcp://141.219.")) // MTU vicon tracker
-		{
-			double viconTransform[16] = {
-				1, 0, 0, 0,  // column major order!
-				0, 0, -1, 0,
-				0, 1, 0, 0,
-				0, 0, 0, 1 };
-			Matrix::mult_vecNd_new(orient, viconTransform, orient, 4);
-			Matrix::mult_vecNd_new(pos4, viconTransform, pos4, 4);
-			Vector::copy(pos, pos4, 3);
-			return 1; // we successfully collected some data
-		}
-		else // Non-Vicon tracker
-		{
-			/* Don't transform other tracking systems */
-			// orient is already filled in
-			Vector::copy(pos, pos4, 3);
-			return 1; // we successfully collected some data
-		}
+		//Swap the pitch and yaw for vrpn->UE4
+		orient[0] = 57.295779513*orientd[2];// kalmanYaw->estimate(orientd[1]);
+		orient[1] = -57.295779513*orientd[0];// kalmanRoll->estimate(orientd[2]);
+		orient[2] = 57.295779513*orientd[1];// kalmanPitch->estimate(orientd[0]);
+		return 1;
 	}
 	return 0;
 }
