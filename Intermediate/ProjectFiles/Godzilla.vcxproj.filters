@@ -1,90 +1,85 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup>
-    <None Include="..\..\Godzilla.uproject" />
-    <Filter Include="Source">
-      <UniqueIdentifier>{BF23BBEA-F00F-45F4-B6C5-655E672981C7}</UniqueIdentifier>
-    </Filter>
-    <None Include="..\..\Source\Godzilla.Target.cs">
-      <Filter>Source</Filter>
-    </None>
-    <None Include="..\..\Source\GodzillaEditor.Target.cs">
-      <Filter>Source</Filter>
-    </None>
-    <Filter Include="Config">
-      <UniqueIdentifier>{176D8B17-4538-4CE4-B9D5-7D860C98B3F6}</UniqueIdentifier>
-    </Filter>
-    <None Include="..\..\Config\DefaultEditor.ini">
-      <Filter>Config</Filter>
-    </None>
-    <None Include="..\..\Config\DefaultEditorPerProjectUserSettings.ini">
-      <Filter>Config</Filter>
-    </None>
-    <None Include="..\..\Config\DefaultEngine.ini">
-      <Filter>Config</Filter>
-    </None>
-    <None Include="..\..\Config\DefaultGame.ini">
-      <Filter>Config</Filter>
-    </None>
-    <None Include="..\..\Config\DefaultInput.ini">
-      <Filter>Config</Filter>
-    </None>
-    <Filter Include="Source\Godzilla">
-      <UniqueIdentifier>{67C5240C-D467-4EDB-AB75-3772C7501FCA}</UniqueIdentifier>
-    </Filter>
-    <None Include="..\..\Source\Godzilla\Godzilla.Build.cs">
-      <Filter>Source\Godzilla</Filter>
-    </None>
-    <ClCompile Include="..\..\Source\Godzilla\Godzilla.cpp">
-      <Filter>Source\Godzilla</Filter>
-    </ClCompile>
-    <ClInclude Include="..\..\Source\Godzilla\Godzilla.h">
-      <Filter>Source\Godzilla</Filter>
-    </ClInclude>
-    <ClCompile Include="..\..\Source\Godzilla\GodzillaCharacter.cpp">
-      <Filter>Source\Godzilla</Filter>
-    </ClCompile>
-    <ClInclude Include="..\..\Source\Godzilla\GodzillaCharacter.h">
-      <Filter>Source\Godzilla</Filter>
-    </ClInclude>
-    <ClCompile Include="..\..\Source\Godzilla\GodzillaGameMode.cpp">
-      <Filter>Source\Godzilla</Filter>
-    </ClCompile>
-    <ClInclude Include="..\..\Source\Godzilla\GodzillaGameMode.h">
-      <Filter>Source\Godzilla</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Source\Godzilla\vrpn">
-      <UniqueIdentifier>{0e0c865b-b600-4098-bf6a-8ddb86045014}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\Source\Godzilla\vrpn\vrpn.h">
-      <Filter>Source\Godzilla\vrpn</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Godzilla\vrpn\kalman.h">
-      <Filter>Source\Godzilla\vrpn</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Godzilla\vrpn\vecmat.h">
-      <Filter>Source\Godzilla\vrpn</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Godzilla\VRPNBall.h">
-      <Filter>Source\Godzilla</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\Source\Godzilla\vrpn\vrpn.cpp">
-      <Filter>Source\Godzilla\vrpn</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Godzilla\vrpn\kalman.cpp">
-      <Filter>Source\Godzilla\vrpn</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Godzilla\vrpn\vecmat.cpp">
-      <Filter>Source\Godzilla\vrpn</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Godzilla\VRPNBall.cpp">
-      <Filter>Source\Godzilla</Filter>
-    </ClCompile>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\Godzilla.uproject" />
+		<Filter Include="Source">
+			<UniqueIdentifier>{5A9F2E7B-152F-419A-AB7D-32DD7251380A}</UniqueIdentifier>
+		</Filter>
+		<None Include="..\..\Source\Godzilla.Target.cs">
+			<Filter>Source</Filter>
+		</None >
+		<None Include="..\..\Source\GodzillaEditor.Target.cs">
+			<Filter>Source</Filter>
+		</None >
+		<Filter Include="Config">
+			<UniqueIdentifier>{1E8B8CCD-3D18-49C4-86DC-2F08CFAEA295}</UniqueIdentifier>
+		</Filter>
+		<None Include="..\..\Config\DefaultEditor.ini">
+			<Filter>Config</Filter>
+		</None >
+		<None Include="..\..\Config\DefaultEditorPerProjectUserSettings.ini">
+			<Filter>Config</Filter>
+		</None >
+		<None Include="..\..\Config\DefaultEngine.ini">
+			<Filter>Config</Filter>
+		</None >
+		<None Include="..\..\Config\DefaultGame.ini">
+			<Filter>Config</Filter>
+		</None >
+		<None Include="..\..\Config\DefaultInput.ini">
+			<Filter>Config</Filter>
+		</None >
+		<Filter Include="Source\Godzilla">
+			<UniqueIdentifier>{605C6D8B-471A-4C66-B6DA-A2DD93126FFC}</UniqueIdentifier>
+		</Filter>
+		<None Include="..\..\Source\Godzilla\Godzilla.Build.cs">
+			<Filter>Source\Godzilla</Filter>
+		</None >
+		<ClCompile Include="..\..\Source\Godzilla\Godzilla.cpp">
+			<Filter>Source\Godzilla</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Godzilla\Godzilla.h">
+			<Filter>Source\Godzilla</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Godzilla\GodzillaCharacter.cpp">
+			<Filter>Source\Godzilla</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Godzilla\GodzillaCharacter.h">
+			<Filter>Source\Godzilla</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Godzilla\GodzillaGameMode.cpp">
+			<Filter>Source\Godzilla</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Godzilla\GodzillaGameMode.h">
+			<Filter>Source\Godzilla</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Godzilla\VRPNBall.cpp">
+			<Filter>Source\Godzilla</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Godzilla\VRPNBall.h">
+			<Filter>Source\Godzilla</Filter>
+		</ClInclude >
+		<Filter Include="Source\Godzilla\vrpn">
+			<UniqueIdentifier>{CEA550A9-267E-4A2B-87D0-3300E5F6405E}</UniqueIdentifier>
+		</Filter>
+		<ClCompile Include="..\..\Source\Godzilla\vrpn\kalman.cpp">
+			<Filter>Source\Godzilla\vrpn</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Godzilla\vrpn\kalman.h">
+			<Filter>Source\Godzilla\vrpn</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Godzilla\vrpn\vecmat.cpp">
+			<Filter>Source\Godzilla\vrpn</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Godzilla\vrpn\vecmat.h">
+			<Filter>Source\Godzilla\vrpn</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Godzilla\vrpn\vrpn.cpp">
+			<Filter>Source\Godzilla\vrpn</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Godzilla\vrpn\vrpn.h">
+			<Filter>Source\Godzilla\vrpn</Filter>
+		</ClInclude >
+	</ItemGroup>
 </Project>
