@@ -4,6 +4,8 @@
 #include "vrpn.h"
 #include "vecmat.h"
 
+VRPN::~VRPN(){}
+
 void VRPN_CALLBACK VRPN::handle_tracker(void *data, vrpn_TRACKERCB t){
 
 	/* Some tracking systems return large values when a point gets
@@ -20,9 +22,66 @@ void VRPN_CALLBACK VRPN::handle_tracker(void *data, vrpn_TRACKERCB t){
 VRPN::VRPN(FString object, FString host){
 	std::string name(TCHAR_TO_UTF8(*host));
 	std::string ob(TCHAR_TO_UTF8(*object));
-	UE_LOG(LogTemp, Warning, TEXT("Connecting to VRPN server: %s"), *host);
 	hostname = name;
+	VRPN::object = ob;
 
+	if (connect()){
+		kalmanX = new Kalman(0.1, 0.1);
+		kalmanY = new Kalman(0.1, 0.1);
+		kalmanZ = new Kalman(0.1, 0.1);
+		kalmanPitch = new Kalman(0.1, 0.1);
+		kalmanYaw = new Kalman(0.1, 0.1);
+		kalmanRoll = new Kalman(0.1, 0.1);
+	}
+	else{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to connect to tracker: %s"), *host);
+		tracker = NULL;
+	}
+}
+
+int VRPN::get(double pos[3], double orient[3]){
+	/* Set to default values */
+	Vector::set(pos, 10000, 10000, 10000);
+	Vector::set(orient, 0, 0, 0);
+
+	//If not connectd, try to connect.
+	//Note this won't try to connect if already connected.
+	if (isConnected() || connect()){
+		tracker->mainloop();
+		vrpn_TRACKERCB t = lastData;
+
+		//Swap the x and y axis for vrpn->UE4
+		pos[0] = t.pos[1];//kalmanX->estimate(t.pos[0]);
+		pos[1] = t.pos[0];//kalmanY->estimate(t.pos[2]);
+		pos[2] = t.pos[2];//kalmanZ->estimate(t.pos[1]);
+
+		q_vec_type orientd;
+		// Convert quaternion into orientation matrix.
+		q_to_euler(orientd, t.quat);
+
+		//Swap the pitch and yaw for vrpn->UE4
+		orient[0] = 57.295779513*orientd[2];// kalmanYaw->estimate(orientd[1]);
+		orient[1] = -57.295779513*orientd[0];// kalmanRoll->estimate(orientd[2]);
+		orient[2] = 57.295779513*orientd[1];// kalmanPitch->estimate(orientd[0]);
+		return 1;
+	}
+	return 0;
+}
+
+bool VRPN::connect(){
+	//If there isn't a thread already, create a new connection thread.
+	if (!connecting){
+		FRunnableThread::Create(this, TEXT("ConnectionThread"), 0, TPri_BelowNormal); //windows default = 8mb for thread, could specify more
+	}
+	return false;
+}
+
+bool VRPN::isConnected(){
+	return tracker != NULL && tracker->connectionPtr()->connected();
+}
+
+uint32 VRPN::Run(){
+	connecting = true;
 	// If we are making a TCP connection and the server isn't up, the following function call may hang for a long time
 	vrpn_Connection *connection = vrpn_get_connection_by_name(hostname.c_str());
 
@@ -36,50 +95,15 @@ VRPN::VRPN(FString object, FString host){
 	if (!connection->connected())
 	{
 		delete connection;
-		UE_LOG(LogTemp, Warning, TEXT("Failed to connect to tracker: %s"), *host);
-		tracker = NULL;
 	}
 	else{
 		connection->mainloop();
-		std::string fullname = ob + "@" + hostname;
+		std::string fullname = object + "@" + hostname;
 
 		tracker = new vrpn_Tracker_Remote(fullname.c_str(), connection);
 
 		tracker->register_change_handler((void*)this, handle_tracker);
-
-		kalmanX = new Kalman(0.1, 0.1);
-		kalmanY = new Kalman(0.1, 0.1);
-		kalmanZ = new Kalman(0.1, 0.1);
-		kalmanPitch = new Kalman(0.1, 0.1);
-		kalmanYaw = new Kalman(0.1, 0.1);
-		kalmanRoll = new Kalman(0.1, 0.1);
 	}
-}
-
-int VRPN::get(double pos[3], double orient[3]){
-	/* Set to default values */
-	Vector::set(pos, 10000, 10000, 10000);
-	Vector::set(orient, 0, 0, 0);
-
-	if (tracker != NULL){
-		tracker->mainloop();
-		vrpn_TRACKERCB t = lastData;
-
-
-		//Swap the y and z axis for vrpn->UE4
-		pos[0] = t.pos[0];//kalmanX->estimate(t.pos[0]);
-		pos[1] = t.pos[2];//kalmanY->estimate(t.pos[2]);
-		pos[2] = t.pos[1];//kalmanZ->estimate(t.pos[1]);
-
-		q_vec_type orientd;
-		// Convert quaternion into orientation matrix.
-		q_to_euler(orientd, t.quat);
-
-		//Swap the yaw and roll for vrpn->UE4
-		orient[0] = 57.295779513*orientd[0];// kalmanPitch->estimate(orientd[0]);
-		orient[1] = 57.295779513*orientd[1];// kalmanRoll->estimate(orientd[2]);
-		orient[2] = 57.295779513*orientd[2];// kalmanYaw->estimate(orientd[1]);
-		return 1;
-	}
+	connecting = false;
 	return 0;
 }
