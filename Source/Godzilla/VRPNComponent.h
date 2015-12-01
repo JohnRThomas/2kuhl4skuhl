@@ -21,11 +21,19 @@ public:
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
+	float runTime;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VRPN Variables")
 	FString Hostname;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VRPN Variables")
 	FString TrackerName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "VRPN Variables")
+	FVector TransformVector;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "VRPN Variables")
+	FRotator RotationMatrix;
 
 private:
 	VRPN* vrpn;

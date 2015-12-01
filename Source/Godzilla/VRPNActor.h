@@ -14,6 +14,7 @@ class GODZILLA_API AVRPNActor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AVRPNActor();
+	//AVRPNActor(FString Host, FString Tracker);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -27,6 +28,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VRPN Variables")
 	FString TrackerName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "VRPN Variables")
+	FVector TransformVector;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "VRPN Variables")
+	FRotator RotationMatrix;
 
 	private:
 	VRPN* vrpn;
