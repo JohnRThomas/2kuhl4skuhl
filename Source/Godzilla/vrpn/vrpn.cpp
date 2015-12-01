@@ -22,39 +22,9 @@ void VRPN_CALLBACK VRPN::handle_tracker(void *data, vrpn_TRACKERCB t){
 VRPN::VRPN(FString object, FString host){
 	std::string name(TCHAR_TO_UTF8(*host));
 	std::string ob(TCHAR_TO_UTF8(*object));
-<<<<<<< HEAD
-	UE_LOG(LogTemp, Warning, TEXT("%s: Connecting to VRPN server: %s"), *object, *host);
-	
-=======
->>>>>>> e6a1abb5db479baae2ad9f9296cfa97295956a78
 	hostname = name;
 	VRPN::object = ob;
 
-<<<<<<< HEAD
-	// If we are making a TCP connection and the server isn't up, the following function call may hang for a long time
-	vrpn_Connection *connection = vrpn_get_connection_by_name(hostname.c_str());
-
-	/* Wait for a bit to see if we can connect. Sometimes we don't immediately connect! */
-	for (int i = 0; i<1000 && !connection->connected(); i++)
-	{
-		Sleep(1);
-		connection->mainloop();
-	}
-	/* If connection failed, exit. */
-	if (!connection->connected())
-	{
-		delete connection;
-		UE_LOG(LogTemp, Warning, TEXT("Failed to connect to tracker: %s"), *host);
-		tracker = NULL;
-	}
-	else{
-		connection->mainloop();
-		std::string fullname = ob + "@" + hostname;
-
-		tracker = new vrpn_Tracker_Remote(fullname.c_str(), connection);
-
-		tracker->register_change_handler((void*)this, handle_tracker);
-=======
 	if (connect()){
 		kalmanX = new Kalman(0.1, 0.1);
 		kalmanY = new Kalman(0.1, 0.1);
@@ -62,7 +32,6 @@ VRPN::VRPN(FString object, FString host){
 		kalmanPitch = new Kalman(0.1, 0.1);
 		kalmanYaw = new Kalman(0.1, 0.1);
 		kalmanRoll = new Kalman(0.1, 0.1);
->>>>>>> e6a1abb5db479baae2ad9f9296cfa97295956a78
 	}
 	else{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to connect to tracker: %s"), *host);
