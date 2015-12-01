@@ -17,7 +17,6 @@ UVRPNComponent::UVRPNComponent()
 	TrackerName = FString(TEXT("test"));
 }
 
-
 // Called when the game starts
 void UVRPNComponent::BeginPlay()
 {
@@ -37,14 +36,22 @@ void UVRPNComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActor
 	double pitch = orient[0];
 	double yaw = orient[1];
 	double roll = orient[2];
-	//UE_LOG(LogTemp, Warning, TEXT("Location(%.2f, %.2f, %.2f)"), x, y, z);
-	//UE_LOG(LogTemp, Warning, TEXT("Angle(%.2f, %.2f, %.2f)"), pitch, yaw, roll);
-	FVector* NewLocation = new FVector(x, y, 200.0 + z);
-	FRotator* NewRotation = new FRotator(pitch, yaw, roll);
+	FVector NewLocation = FVector(x, y, 200.0 + z);
+	FRotator NewRotation = FRotator(pitch, yaw, roll);
 
+	float DeltaHeight = (FMath::Sin(runTime + DeltaTime) - FMath::Sin(runTime));
+	NewLocation.X = x;
+	NewLocation.Y = y;
+	NewLocation.Z = 200.0 + z + DeltaHeight * 20.0f;
+	NewRotation.Pitch = pitch;
+	NewRotation.Yaw = yaw;
+	NewRotation.Roll = roll;
+	runTime += DeltaTime;
 	if (x > -300 && x < 300 && y > -300 && y < 300 && z > -300 && z < 300){
-		//SetWorldLocationAndRotation(*NewLocation, *NewRotation);
-		SetWorldRotation(*NewRotation);
+		SetWorldLocationAndRotation(NewLocation, NewRotation);
 	}
+
+	TransformVector = NewLocation;
+	RotationMatrix = NewRotation;
 }
 

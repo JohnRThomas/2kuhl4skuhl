@@ -18,7 +18,7 @@ AVRPNActor::AVRPNActor()
 void AVRPNActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	UE_LOG(LogTemp, Warning, TEXT("%s: Connecting..."), *TrackerName);
 	vrpn = new VRPN(TrackerName, Hostname);
 }
 
@@ -33,10 +33,8 @@ void AVRPNActor::Tick( float DeltaTime )
 	double pitch = orient[0];
 	double yaw = orient[1];
 	double roll = orient[2];
-	//UE_LOG(LogTemp, Warning, TEXT("Location(%.2f, %.2f, %.2f)"), x, y, z);
-	//UE_LOG(LogTemp, Warning, TEXT("Angle(%.2f, %.2f, %.2f)"), pitch, yaw, roll);
-	FVector NewLocation = GetActorLocation();
-	FRotator NewRotation = GetActorRotation();
+	FVector NewLocation = FVector(x, y, 200.0 + z); //GetActorLocation();
+	FRotator NewRotation = FRotator(pitch, yaw, roll); //GetActorRotation();
 	float DeltaHeight = (FMath::Sin(runTime + DeltaTime) - FMath::Sin(runTime));
 	NewLocation.X = x;
 	NewLocation.Y = y;
@@ -48,5 +46,8 @@ void AVRPNActor::Tick( float DeltaTime )
 	if (x > -300 && x < 300 && y > -300 && y < 300 && z > -300 && z < 300){
 		SetActorLocationAndRotation(NewLocation, NewRotation);
 	}
+
+	TransformVector = NewLocation;
+	RotationMatrix = NewRotation;
 }
 

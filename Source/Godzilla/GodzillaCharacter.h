@@ -1,6 +1,8 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Character.h"
+//#include "VRPNActor.h"
+//#include "vrpn/vrpn.h"
 #include "GodzillaCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -59,6 +61,10 @@ protected:
 	// End of APawn interface
 
 public:
+
+	//class AVRPNActor RightHand;
+	//class AVRPNActor LeftHand;
+
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/

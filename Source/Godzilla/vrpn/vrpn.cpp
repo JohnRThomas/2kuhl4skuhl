@@ -20,7 +20,8 @@ void VRPN_CALLBACK VRPN::handle_tracker(void *data, vrpn_TRACKERCB t){
 VRPN::VRPN(FString object, FString host){
 	std::string name(TCHAR_TO_UTF8(*host));
 	std::string ob(TCHAR_TO_UTF8(*object));
-	UE_LOG(LogTemp, Warning, TEXT("Connecting to VRPN server: %s"), *host);
+	UE_LOG(LogTemp, Warning, TEXT("%s: Connecting to VRPN server: %s"), *object, *host);
+	
 	hostname = name;
 
 	// If we are making a TCP connection and the server isn't up, the following function call may hang for a long time
@@ -46,19 +47,12 @@ VRPN::VRPN(FString object, FString host){
 		tracker = new vrpn_Tracker_Remote(fullname.c_str(), connection);
 
 		tracker->register_change_handler((void*)this, handle_tracker);
-
-		kalmanX = new Kalman(0.1, 0.1);
-		kalmanY = new Kalman(0.1, 0.1);
-		kalmanZ = new Kalman(0.1, 0.1);
-		kalmanPitch = new Kalman(0.1, 0.1);
-		kalmanYaw = new Kalman(0.1, 0.1);
-		kalmanRoll = new Kalman(0.1, 0.1);
 	}
 }
 
 int VRPN::get(double pos[3], double orient[3]){
 	/* Set to default values */
-	Vector::set(pos, 10000, 10000, 10000);
+	Vector::set(pos, 0, 0, 0);
 	Vector::set(orient, 0, 0, 0);
 
 	if (tracker != NULL){
@@ -79,6 +73,9 @@ int VRPN::get(double pos[3], double orient[3]){
 		orient[1] = -57.295779513*orientd[0];// kalmanRoll->estimate(orientd[2]);
 		orient[2] = 57.295779513*orientd[1];// kalmanPitch->estimate(orientd[0]);
 		return 1;
+	}
+	else{
+		//connect();
 	}
 	return 0;
 }
