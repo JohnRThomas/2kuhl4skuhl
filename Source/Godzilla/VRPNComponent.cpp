@@ -21,8 +21,8 @@ UVRPNComponent::UVRPNComponent()
 void UVRPNComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	vrpn = new VRPN(TrackerName, Hostname);	
+	UE_LOG(LogTemp, Warning, TEXT("%s: Connecting..."), *TrackerName);
+	vrpn = new VRPN(TrackerName, Hostname);
 }
 
 // Called every frame
